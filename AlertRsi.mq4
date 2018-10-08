@@ -6,6 +6,7 @@
 #property copyright   "2005-2014, MetaQuotes Software Corp."
 #property link        "http://www.mql4.com"
 #property description "Relative Strength Index"
+#property version   "1.01"
 #property strict
 
 #property indicator_separate_window
@@ -25,6 +26,9 @@ input int InpHigh=68;   // Alert High
 double ExtRSIBuffer[];
 double ExtPosBuffer[];
 double ExtNegBuffer[];
+
+static double _value = 0;
+static double _valuePrev = 0;
 //+------------------------------------------------------------------+
 //| Custom indicator initialization function                         |
 //+------------------------------------------------------------------+
@@ -50,6 +54,8 @@ int OnInit(void)
      }
 //---
    SetIndexDrawBegin(0,InpRSIPeriod);
+
+   _valuePrev = _value = 0;
 //--- initialization done
    return(INIT_SUCCEEDED);
   }
@@ -130,10 +136,13 @@ int OnCalculate(const int rates_total,
         }
      }
 //---
-    double _value = iRSI(NULL,PERIOD_CURRENT,InpRSIPeriod,PRICE_CLOSE,0);
-    if((_value <= InpLow) || (_value >= InpHigh)) {
-        Alert("RSI:",_value);
+    _value = iRSI(NULL,PERIOD_CURRENT,InpRSIPeriod,PRICE_CLOSE,0);
+    if(((_value <= InpLow) && (_valuePrev > InpLow)) ||
+       ((_value >= InpHigh) && (_valuePrev < InpHigh)))
+    {
+        Alert("RSI:",_valuePrev," -> ",_value);
     }
+    _valuePrev = _value;
    return(rates_total);
   }
 //+------------------------------------------------------------------+
