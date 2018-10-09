@@ -6,7 +6,7 @@
 #property copyright   "2005-2014, MetaQuotes Software Corp."
 #property link        "http://www.mql4.com"
 #property description "Relative Strength Index"
-#property version   "1.01"
+#property version   "1.02"
 #property strict
 
 #property indicator_separate_window
@@ -55,7 +55,7 @@ int OnInit(void)
 //---
    SetIndexDrawBegin(0,InpRSIPeriod);
 
-   _valuePrev = _value = 0;
+   _valuePrev = _value = iRSI(NULL,PERIOD_CURRENT,InpRSIPeriod,PRICE_CLOSE,0);;
 //--- initialization done
    return(INIT_SUCCEEDED);
   }
@@ -140,10 +140,32 @@ int OnCalculate(const int rates_total,
     if(((_value <= InpLow) && (_valuePrev > InpLow)) ||
        ((_value >= InpHigh) && (_valuePrev < InpHigh)))
     {
-        Alert("RSI:",_valuePrev," -> ",_value);
+        Alert(Symbol(),",",PeriodToString(Period())," RSI:(",_valuePrev,") -> (",_value,")");
     }
     _valuePrev = _value;
    return(rates_total);
   }
+
+string PeriodToString(int period){
+   string value = "";
+   
+   if(period == 0){
+      period = Period();
+   }
+   
+   switch(period){
+      case PERIOD_M1:  value = "M1";   break;
+      case PERIOD_M5:  value = "M5";   break;
+      case PERIOD_M15: value = "M15"; break;
+      case PERIOD_M30: value = "M30"; break;
+      case PERIOD_H1:  value = "H1"; break;
+      case PERIOD_H4:  value = "H4"; break;
+      case PERIOD_D1:  value = "D1";    break;
+      case PERIOD_W1:  value = "W1";    break;
+      case PERIOD_MN1: value = "MN1";   break;
+      default: break;
+   }
+   return(value);
+}
 //+------------------------------------------------------------------+
 
